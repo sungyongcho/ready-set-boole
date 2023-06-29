@@ -11,6 +11,7 @@ int multiplier(int a, int b)
   while (b != 0)
   {
     if (b & 1)
+      // result += a;
       result = result ^ a;
     a = a << 1;
     b = b >> 1;
