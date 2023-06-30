@@ -3,32 +3,16 @@
 #include <stack>
 #include <vector>
 
-void ASTNode::tokenize(std::string str, std::string symbols) {
-  try {
-    for (int i = 0; i < (int)str.size(); i++) {
-      if (symbols.find(str[i]) != std::string::npos) {
-        this->tokens.push_back(str[i]);
-      } else {
-        this->tokens.clear();  // Clear the vector
-        throw std::invalid_argument("Invalid character input - [" + std::string(1, str[i]) + "]");
-      }
-    }
-  } catch (const std::invalid_argument &e) {
-    std::cout << "Error: " << e.what() << std::endl;
-    this->tokens.clear();  // Clear the vector
-  }
-}
-
 bool isBinaryOperator(char token) {
   return (token == '&' || token == '|' || token == '^' || token == '>' || token == '=');
 }
 
-void ASTNode::parseExpression(void) {
+ASTNode *ASTNode::parseExpression(const std::vector<char> &tokens) {
   std::stack<ASTNode *> operandStack;
 
   try {
-    for (int i = 0; i < static_cast<int>(this->tokens.size()); i++) {
-      char token = this->tokens[i];
+    for (int i = 0; i < static_cast<int>(tokens.size()); i++) {
+      char token = tokens[i];
       if (isBinaryOperator(token)) {
         // Binary operation
         if (operandStack.size() < 2) {
@@ -70,7 +54,7 @@ void ASTNode::parseExpression(void) {
 
     ASTNode *parsedExpression = operandStack.top();
     operandStack.pop();
-    // return parsedExpression;
+    return parsedExpression;
   } catch (const std::exception &e) {
     // Clean up the remaining nodes in the operand stack
     while (!operandStack.empty()) {
@@ -80,7 +64,7 @@ void ASTNode::parseExpression(void) {
     }
 
     std::cout << e.what() << std::endl;
-    // return nullptr;  // Return nullptr or some error value indicating failure
+    return nullptr;  // Return nullptr or some error value indicating failure
   }
 }
 

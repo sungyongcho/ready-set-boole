@@ -12,10 +12,10 @@ class ASTNode {
  public:
   virtual ~ASTNode() {}
 
-  void parseExpression(void);
+  static ASTNode *parseExpression(const std::vector<char> &tokens);
   virtual bool evaluate() = 0;
   void printAST(const std::string &prefix = "", bool isLeft = false) const;
-  void tokenize(std::string str, std::string symbols);
+  // void tokenize(std::string str, std::string symbols);
 
  private:
   std::vector<char> tokens;
