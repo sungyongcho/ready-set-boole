@@ -21,11 +21,14 @@ bool eval_formula(std::string str) {
 }
 
 int main() {
-
   std::cout << eval_formula("10&") << std::endl;
+  // false
   std::cout << eval_formula("10|") << std::endl;
+  // true
   std::cout << eval_formula("11>") << std::endl;
+  // true
   std::cout << eval_formula("10=") << std::endl;
+  // false
   std::cout << eval_formula("1011||=") << std::endl;
-
+  // true
 }
