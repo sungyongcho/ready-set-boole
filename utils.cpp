@@ -78,13 +78,10 @@ void printTableHeader(const std::vector<char> &variables) {
   std::cout << std::endl;
 }
 
-void printTableRows(const std::vector<std::vector<int> > &truthTable) {
-  for (int i = 0; i < (int)truthTable.size(); i++) {
-    const std::vector<int> &row = truthTable[i];
-    std::cout << "| ";
-    for (int j = 0; j < (int)row.size(); j++) {
-      std::cout << row[j] << " | ";
-    }
-    std::cout << std::endl;
+void printTableRow(const std::vector<int> &row) {
+  std::cout << "| ";
+  for (int i = 0; i < (int)row.size(); i++) {
+    std::cout << row[i] << " | ";
   }
+  std::cout << std::endl;
 }
