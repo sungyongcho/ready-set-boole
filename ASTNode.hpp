@@ -18,6 +18,10 @@ class ASTNode {
   virtual bool evaluate() = 0;
   virtual bool evaluate(const VariableAssignments &variableAssignments) = 0;
   void printAST(const std::string &prefix = "", bool isLeft = false) const;
+  ASTNode *expand();
+  ASTNode *expandLogicalOr(ASTNode *left, ASTNode *right);
+  ASTNode *expandExclusiveOr(ASTNode *left, ASTNode *right);
+  ASTNode *expandImplication(ASTNode *left, ASTNode *right);
   // void tokenize(std::string str, std::string symbols);
 
  private:
