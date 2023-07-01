@@ -37,13 +37,14 @@ ASTNode *ASTNode::parseExpression(const std::vector<char> &tokens) {
         operandStack.push(unaryOperationNode);
       } else {
         // Operand (numeric literal)
-        if (!isdigit(token)) {
-          throw std::runtime_error("Invalid expression: Invalid operand token");
+        if (isalpha(token)) {
+          ASTNode *operandNode = new OperandNode(token, 0);
+          operandStack.push(operandNode);
+        } else {
+          int value = token - '0';
+          ASTNode *operandNode = new OperandNode(value);
+          operandStack.push(operandNode);
         }
-
-        int value = token - '0';
-        ASTNode *operandNode = new OperandNode(value);
-        operandStack.push(operandNode);
       }
     }
 
@@ -74,7 +75,10 @@ void ASTNode::printAST(const std::string &prefix, bool isLeft) const {
 
   if (const OperandNode *operandNode = dynamic_cast<const OperandNode *>(this)) {
     // Print operand node value
-    std::cout << "Operand: " << operandNode->getValue() << std::endl;
+    if (isalpha(operandNode->getVariable()))
+      std::cout << "Operand Variable: " << operandNode->getVariable() << " / Value: " << operandNode->getValue() << std::endl;
+    else
+      std::cout << "Operand: " << operandNode->getValue() << std::endl;
   } else if (const UnaryOperationNode *unaryNode = dynamic_cast<const UnaryOperationNode *>(this)) {
     std::cout << "Unary Operation: " << unaryNode->getOperator() << std::endl;
     // Print left child
