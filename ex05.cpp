@@ -6,6 +6,10 @@
 #include "ASTNode.hpp"
 #include "utils.hpp"
 
+// ref:
+// https://logic4free.informatik.uni-kiel.de/llocs/Negation_normal_form
+// (this is gold)
+
 std::string negation_normal_form(std::string format) {
   std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
 
