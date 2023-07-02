@@ -18,11 +18,11 @@ class ASTNode {
   virtual bool evaluate() = 0;
   virtual bool evaluate(const VariableAssignments &variableAssignments) = 0;
   void printAST(const std::string &prefix = "", bool isLeft = false) const;
-  ASTNode *expand();
-  ASTNode *expandLogicalOr(ASTNode *left, ASTNode *right);
-  ASTNode *expandExclusiveOr(ASTNode *left, ASTNode *right);
-  ASTNode *expandImplication(ASTNode *left, ASTNode *right);
   // void tokenize(std::string str, std::string symbols);
+  static ASTNode *NegNNF(ASTNode *phi);
+  static ASTNode *BNF2NNF(ASTNode *formula);
+  // New function to get the postfix form as a string
+  virtual std::string getPostfix() const = 0;
 
  private:
   std::vector<char> tokens;
@@ -49,6 +49,10 @@ class OperandNode : public ASTNode {
     char variable = getVariable();
     int value = variableAssignments.at(variable);
     return static_cast<bool>(value);
+  }
+  // Get the operand in postfix form as a string
+  std::string getPostfix() const {
+    return std::string(1, getVariable());
   }
 
  private:
@@ -77,6 +81,10 @@ class UnaryOperationNode : public ASTNode {
     } else {
       throw std::runtime_error("Invalid unary operator");
     }
+  }
+  // Get the unary operation in postfix form as a string
+  std::string getPostfix() const {
+    return operand->getPostfix() + getOperator();
   }
 
  private:
@@ -129,6 +137,9 @@ class BinaryOperationNode : public ASTNode {
     } else {
       throw std::runtime_error("Invalid binary operator");
     }
+  }
+  std::string getPostfix() const {
+    return left->getPostfix() + right->getPostfix() + getOperator();
   }
 
  private:

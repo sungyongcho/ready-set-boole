@@ -96,63 +96,78 @@ void ASTNode::printAST(const std::string &prefix, bool isLeft) const {
   // Add conditions for other types of nodes if needed
 }
 
-ASTNode *ASTNode::expand() {
-  if (const UnaryOperationNode *unaryNode = dynamic_cast<const UnaryOperationNode *>(this)) {
+ASTNode *ASTNode::NegNNF(ASTNode *phi) {
+  if (phi == nullptr) {
+    return nullptr;
+  }
+
+  if (const OperandNode *operandNode = dynamic_cast<const OperandNode *>(phi)) {
+    // Negate the operand
+    char variable = operandNode->getVariable();
+    int value = operandNode->getValue();
+    return new UnaryOperationNode('!', new OperandNode(variable, value));
+  } else if (const UnaryOperationNode *unaryNode = dynamic_cast<const UnaryOperationNode *>(phi)) {
     if (unaryNode->getOperator() == '!') {
-      if (const BinaryOperationNode *binaryNode = dynamic_cast<const BinaryOperationNode *>(unaryNode->getOperand())) {
-        // Expand negation of a binary operation
-        ASTNode *leftExpansion = new UnaryOperationNode('!', binaryNode->getLeft()->expand());
-        ASTNode *rightExpansion = new UnaryOperationNode('!', binaryNode->getRight()->expand());
-        return new BinaryOperationNode(binaryNode->getOperator(), leftExpansion, rightExpansion);
-      } else if (const UnaryOperationNode *innerUnaryNode = dynamic_cast<const UnaryOperationNode *>(unaryNode->getOperand())) {
-        // Expand double negation
-        return innerUnaryNode->getOperand()->expand();
-      }
+      ASTNode *operand = unaryNode->getOperand();
+      return operand->expand();  // Apply expansion to the operand
     }
-    // Expand negation of a variable or operand
-    return new UnaryOperationNode('!', unaryNode->getOperand()->expand());
-  } else if (const BinaryOperationNode *binaryNode = dynamic_cast<const BinaryOperationNode *>(this)) {
-    ASTNode *leftExpansion = binaryNode->getLeft()->expand();
-    ASTNode *rightExpansion = binaryNode->getRight()->expand();
-    if (binaryNode->getOperator() == '&') {
-      return new BinaryOperationNode('&', leftExpansion, rightExpansion);
-    } else if (binaryNode->getOperator() == '|') {
-      ASTNode *negatedLeft = new UnaryOperationNode('!', leftExpansion);
-      ASTNode *negatedRight = new UnaryOperationNode('!', rightExpansion);
-      return new BinaryOperationNode('&', negatedLeft, negatedRight);
-    } else if (binaryNode->getOperator() == '^') {
-      ASTNode *leftAndRight = new BinaryOperationNode('&', leftExpansion, rightExpansion);
-      ASTNode *negatedLeftAndRight = new UnaryOperationNode('!', leftAndRight);
-      ASTNode *leftAndNegatedRight = new BinaryOperationNode('&', leftExpansion, new UnaryOperationNode('!', rightExpansion));
-      return new BinaryOperationNode('&', negatedLeftAndRight, leftAndNegatedRight);
+  } else if (const BinaryOperationNode *binaryNode = dynamic_cast<const BinaryOperationNode *>(phi)) {
+    char op = binaryNode->getOperator();
+    ASTNode *left = binaryNode->getLeft();
+    ASTNode *right = binaryNode->getRight();
+
+    ASTNode *negNNFLeft = NegNNF(left);
+    ASTNode *negNNFRight = NegNNF(right);
+
+    if (op == '|') {
+      return new BinaryOperationNode('&', negNNFLeft, negNNFRight);
+    } else if (op == '&') {
+      return new BinaryOperationNode('|', negNNFLeft, negNNFRight);
+    } else if (op == '>') {
+      return new BinaryOperationNode('|', NegNNF(negNNFLeft), negNNFRight);
+    } else if (op == '=') {
+      return new BinaryOperationNode('&', new BinaryOperationNode('|', negNNFLeft, NegNNF(negNNFRight)),
+                                     new BinaryOperationNode('|', NegNNF(negNNFLeft), negNNFRight));
+    } else if (op == '^') {
+      return new BinaryOperationNode('|', new BinaryOperationNode('&', negNNFLeft, NegNNF(negNNFRight)),
+                                     new BinaryOperationNode('&', NegNNF(negNNFLeft), negNNFRight));
+    }
+  }
+
+  throw std::runtime_error("Invalid formula in NNF");
+}
+
+ASTNode *ASTNode::BNF2NNF(ASTNode *formula) {
+  if (const OperandNode *operandNode = dynamic_cast<const OperandNode *>(formula)) {
+    // Base case: formula is an operand (variable)
+    return new OperandNode(operandNode->getVariable(), operandNode->getValue());
+  } else if (const UnaryOperationNode *unaryNode = dynamic_cast<const UnaryOperationNode *>(formula)) {
+    // Unary operation (negation)
+    if (unaryNode->getOperator() == '!') {
+      return NegNNF(BNF2NNF(unaryNode->getOperand()));
+    } else {
+      throw std::runtime_error("Invalid unary operator");
+    }
+  } else if (const BinaryOperationNode *binaryNode = dynamic_cast<const BinaryOperationNode *>(formula)) {
+    // Binary operation
+    ASTNode *left = BNF2NNF(binaryNode->getLeft());
+    ASTNode *right = BNF2NNF(binaryNode->getRight());
+    if (binaryNode->getOperator() == '|') {
+      return new BinaryOperationNode('|', left, right);
+    } else if (binaryNode->getOperator() == '&') {
+      return new BinaryOperationNode('&', left, right);
     } else if (binaryNode->getOperator() == '>') {
-      ASTNode *leftNegated = new UnaryOperationNode('!', leftExpansion);
-      return new BinaryOperationNode('|', leftNegated, rightExpansion);
+      return new BinaryOperationNode('|', NegNNF(left), right);
+    } else if (binaryNode->getOperator() == '=') {
+      return new BinaryOperationNode('&', new BinaryOperationNode('|', left, NegNNF(right)),
+                                     new BinaryOperationNode('|', NegNNF(left), right));
+    } else if (binaryNode->getOperator() == '^') {
+      return new BinaryOperationNode('|', new BinaryOperationNode('&', left, NegNNF(right)),
+                                     new BinaryOperationNode('&', NegNNF(left), right));
     } else {
       throw std::runtime_error("Invalid binary operator");
     }
-  } else if (const OperandNode *operandNode = dynamic_cast<const OperandNode *>(this)) {
-    // For operand nodes, just return the current node
-    return new OperandNode(operandNode->getVariable(), operandNode->getValue());
+  } else {
+    throw std::runtime_error("Invalid node type");
   }
-
-  throw std::runtime_error("Invalid node type");
-}
-
-ASTNode *ASTNode::expandLogicalOr(ASTNode *left, ASTNode *right) {
-  ASTNode *negatedLeft = new UnaryOperationNode('!', left);
-  ASTNode *negatedRight = new UnaryOperationNode('!', right);
-  return new BinaryOperationNode('&', negatedLeft, negatedRight);
-}
-
-ASTNode *ASTNode::expandExclusiveOr(ASTNode *left, ASTNode *right) {
-  ASTNode *leftAndRight = new BinaryOperationNode('&', left, right);
-  ASTNode *negatedLeftAndRight = new UnaryOperationNode('!', leftAndRight);
-  ASTNode *leftAndNegatedRight = new BinaryOperationNode('&', left, new UnaryOperationNode('!', right));
-  return new BinaryOperationNode('&', negatedLeftAndRight, leftAndNegatedRight);
-}
-
-ASTNode *ASTNode::expandImplication(ASTNode *left, ASTNode *right) {
-  ASTNode *leftNegated = new UnaryOperationNode('!', left);
-  return new BinaryOperationNode('|', leftNegated, right);
 }
