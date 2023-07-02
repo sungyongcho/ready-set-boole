@@ -18,6 +18,7 @@ std::string conjunctive_normal_form(std::string format) {
   // rootNode->printAST();
 
   ASTNode *nnfRoot = ASTNode::BNF2NNF(rootNode);
+  // ASTNode *cnfRoot = ASTNode::convertToCNF(nnfRoot);
 
   // also if you want to see
   // nnfRoot->printAST();
@@ -30,6 +31,9 @@ int main() {
   // A!B!|
   std::cout << conjunctive_normal_form("AB|!") << std::endl;
   // A!B!&
+  std::cout << conjunctive_normal_form("AB|C&") << std::endl;
   // A!B!&C!|
+  std::cout << conjunctive_normal_form("AB|C|D|") << std::endl;
+  // ABCD|||
   return 0;
 }

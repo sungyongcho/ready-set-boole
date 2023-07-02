@@ -96,7 +96,6 @@ void ASTNode::printAST(const std::string &prefix, bool isLeft) const {
   // Add conditions for other types of nodes if needed
 }
 
-
 ASTNode *ASTNode::NegNNF(ASTNode *phi) {
   if (phi == nullptr) {
     return nullptr;
