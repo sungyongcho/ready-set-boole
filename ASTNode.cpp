@@ -96,6 +96,7 @@ void ASTNode::printAST(const std::string &prefix, bool isLeft) const {
   // Add conditions for other types of nodes if needed
 }
 
+
 ASTNode *ASTNode::NegNNF(ASTNode *phi) {
   if (phi == nullptr) {
     return nullptr;
@@ -109,7 +110,7 @@ ASTNode *ASTNode::NegNNF(ASTNode *phi) {
   } else if (const UnaryOperationNode *unaryNode = dynamic_cast<const UnaryOperationNode *>(phi)) {
     if (unaryNode->getOperator() == '!') {
       ASTNode *operand = unaryNode->getOperand();
-      return operand->expand();  // Apply expansion to the operand
+      return NegNNF(operand);  // Recursively apply negation to the operand
     }
   } else if (const BinaryOperationNode *binaryNode = dynamic_cast<const BinaryOperationNode *>(phi)) {
     char op = binaryNode->getOperator();
