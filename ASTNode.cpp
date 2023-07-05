@@ -171,3 +171,33 @@ ASTNode *ASTNode::BNF2NNF(ASTNode *formula) {
     throw std::runtime_error("Invalid node type");
   }
 }
+
+void ASTNode::transformOperations(ASTNode* node) {
+  if (node == nullptr)
+    return;
+
+  if (BinaryOperationNode* binaryNode = dynamic_cast<BinaryOperationNode*>(node)) {
+    transformOperations(binaryNode->getLeft());
+    transformOperations(binaryNode->getRight());
+
+    if (binaryNode->getOperator() == '&' || binaryNode->getOperator() == '|') {
+      ASTNode* leftChild = binaryNode->getLeft();
+      ASTNode* rightChild = binaryNode->getRight();
+
+      if (leftChild != nullptr && dynamic_cast<BinaryOperationNode*>(leftChild) != nullptr &&
+          dynamic_cast<BinaryOperationNode*>(leftChild)->getOperator() == binaryNode->getOperator()) {
+
+        BinaryOperationNode* leftChildBinaryNode = dynamic_cast<BinaryOperationNode*>(leftChild);
+        ASTNode* grandchild = leftChildBinaryNode->getRight();
+
+        // Perform right shift
+        binaryNode->setLeft(leftChildBinaryNode->getLeft());
+        binaryNode->setRight(new BinaryOperationNode(binaryNode->getOperator(), grandchild, rightChild));
+        delete leftChildBinaryNode;
+
+        // Call the function recursively on the updated binaryNode
+        transformOperations(binaryNode);
+      }
+    }
+  }
+}

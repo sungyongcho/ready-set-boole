@@ -21,8 +21,11 @@ class ASTNode {
   // void tokenize(std::string str, std::string symbols);
   static ASTNode *NegNNF(ASTNode *phi);
   static ASTNode *BNF2NNF(ASTNode *formula);
+  static void transformOperations(ASTNode* node);
   // New function to get the postfix form as a string
   virtual std::string getPostfix() const = 0;
+
+
 
  private:
   std::vector<char> tokens;
@@ -55,6 +58,9 @@ class OperandNode : public ASTNode {
     return std::string(1, getVariable());
   }
 
+  // Get the inorder postfix form as a string (same as the postfix form)
+
+
  private:
   char variable;
   int value;
@@ -86,6 +92,8 @@ class UnaryOperationNode : public ASTNode {
   std::string getPostfix() const {
     return operand->getPostfix() + getOperator();
   }
+
+    // Get the inorder postfix form as a string
 
  private:
   char op;
@@ -141,7 +149,8 @@ class BinaryOperationNode : public ASTNode {
   std::string getPostfix() const {
     return left->getPostfix() + right->getPostfix() + getOperator();
   }
-
+  void setLeft(ASTNode* node) { left = node; }
+  void setRight(ASTNode* node) { right = node; }
  private:
   char op;
   ASTNode *left;
