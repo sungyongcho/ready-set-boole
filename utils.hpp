@@ -20,4 +20,7 @@ void printTableRow(const std::vector<int> &row);
 std::string conjunctive_normal_form(std::string format);
 // ex07
 bool sat(const std::string &formula);
+// ex08
+std::vector<std::vector<int> > powerset(const std::vector<int>& set);
+std::vector<std::vector<int> > powerset_iter(const std::vector<int>& set);
 #endif  // UTILS_HPP
