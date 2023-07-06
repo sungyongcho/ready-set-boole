@@ -172,6 +172,36 @@ ASTNode *ASTNode::BNF2NNF(ASTNode *formula) {
   }
 }
 
+void ASTNode::transformDisjunctionToConjunction(ASTNode* node) {
+  if (node == nullptr)
+    return;
+
+  if (BinaryOperationNode* binaryNode = dynamic_cast<BinaryOperationNode*>(node)) {
+    transformDisjunctionToConjunction(binaryNode->getLeft());
+    transformDisjunctionToConjunction(binaryNode->getRight());
+
+    if (binaryNode->getOperator() == '|') {
+      ASTNode* leftChild = binaryNode->getLeft();
+      ASTNode* rightChild = binaryNode->getRight();
+
+      if (leftChild != nullptr && dynamic_cast<BinaryOperationNode*>(leftChild) != nullptr &&
+          dynamic_cast<BinaryOperationNode*>(leftChild)->getOperator() == '|') {
+
+        BinaryOperationNode* leftChildBinaryNode = dynamic_cast<BinaryOperationNode*>(leftChild);
+        ASTNode* grandchild = leftChildBinaryNode->getRight();
+
+        // Perform right shift
+        binaryNode->setLeft(leftChildBinaryNode->getLeft());
+        binaryNode->setRight(new BinaryOperationNode('&', grandchild, rightChild));
+        delete leftChildBinaryNode;
+
+        // Call the function recursively on the updated binaryNode
+        transformDisjunctionToConjunction(binaryNode);
+      }
+    }
+  }
+}
+
 void ASTNode::transformOperations(ASTNode* node) {
   if (node == nullptr)
     return;

@@ -21,6 +21,8 @@ class ASTNode {
   // void tokenize(std::string str, std::string symbols);
   static ASTNode *NegNNF(ASTNode *phi);
   static ASTNode *BNF2NNF(ASTNode *formula);
+    static void transformDisjunctionToConjunction(ASTNode* node);
+  static std::vector<ASTNode*> tseitinTransformation(ASTNode* node, int& counter);
   static void transformOperations(ASTNode* node);
   // New function to get the postfix form as a string
   virtual std::string getPostfix() const = 0;
