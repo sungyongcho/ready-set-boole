@@ -15,4 +15,9 @@ VariableAssignments createVariableAssignment(const std::vector<char> &variables,
 void printTableHeader(const std::vector<char> &variables);
 void printTableRow(const std::vector<int> &row);
 // for ex04
+
+// ex06
+std::string conjunctive_normal_form(std::string format);
+// ex07
+bool sat(const std::string &formula);
 #endif  // UTILS_HPP
