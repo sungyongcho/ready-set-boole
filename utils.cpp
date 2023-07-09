@@ -207,3 +207,28 @@ VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> >
 
   return variableMapping;
 }
+
+double map(uint16_t x, uint16_t y) {
+  const uint64_t maxValue = (1ULL << 16) - 1;
+  try {
+    if (x > maxValue || y > maxValue) {
+      throw std::out_of_range("Input out of range.");
+    }
+
+    uint64_t interleaved = (static_cast<unsigned long long>(x) << 16) | y;
+    return static_cast<double>(interleaved) / (maxValue * maxValue);
+  } catch (const std::out_of_range &e) {
+    std::cout << "Error: " << e.what() << std::endl;
+    return 0.0;
+  }
+}
+
+void reverse_map(double n) {
+  const uint64_t maxValue = (1ULL << 16) - 1;
+  uint64_t encodedValue = static_cast<uint64_t>(n * (maxValue * maxValue));
+
+  uint16_t y = encodedValue & maxValue;
+  uint16_t x = (encodedValue >> 16) & maxValue;
+
+  std::cout << "Decoded value: (" << x << ", " << y << ")" << std::endl;
+}

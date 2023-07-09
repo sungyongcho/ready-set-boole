@@ -28,4 +28,11 @@ std::vector<std::vector<int> > powerset_iter(const std::vector<int>& set);
 // for ex09
 typedef std::unordered_map<char, std::vector<int> > VariableAssignmentSet;
 VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> >& sets, const std::vector<char>& variables);
+// for ex09
+
+// ex10
+double map(uint16_t x, uint16_t y);
+// ex11
+void reverse_map(double n);
+
 #endif  // UTILS_HPP
