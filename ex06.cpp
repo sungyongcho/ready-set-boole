@@ -7,10 +7,7 @@
 #include "utils.hpp"
 
 int main() {
-
-
-
-  std::cout << conjunctive_normal_form("AB&!") <<  std::endl;
+  std::cout << conjunctive_normal_form("AB&!") << std::endl;
   // A!B!|
   std::cout << conjunctive_normal_form("AB|!") << std::endl;
   // A!B!&
@@ -28,6 +25,4 @@ int main() {
   // my own
   std::cout << conjunctive_normal_form("AB^") << std::endl;
   std::cout << conjunctive_normal_form("AB=") << std::endl;
-
-  return 0;
 }
