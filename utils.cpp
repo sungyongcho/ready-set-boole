@@ -84,7 +84,10 @@ void printTableHeader(const std::vector<char> &variables) {
 void printTableRow(const std::vector<int> &row) {
   std::cout << "| ";
   for (int i = 0; i < (int)row.size(); i++) {
-    std::cout << row[i] << " | ";
+    if (i + 1 == (int)row.size())
+      std::cout << row[i] << " |";
+    else
+      std::cout << row[i] << " | ";
   }
   std::cout << std::endl;
 }
