@@ -1,9 +1,10 @@
 #include "utils.hpp"
-#include "ASTNode.hpp"
 
 #include <iostream>
-#include <vector>
 #include <stack>
+#include <vector>
+
+#include "ASTNode.hpp"
 
 std::vector<char> tokenize(std::string str, std::string symbols) {
   std::vector<char> tokens;
@@ -26,7 +27,7 @@ std::vector<char> tokenize(std::string str, std::string symbols) {
 std::vector<char> extractVariables(std::vector<char> tokens) {
   std::vector<char> variables;
   for (std::vector<char>::iterator it = tokens.begin(); it != tokens.end(); it++) {
-    if (isalpha(*it)) {
+    if (isalpha(*it) && std::find(variables.begin(), variables.end(), *it) == variables.end()) {
       variables.push_back(*it);
     }
   }
@@ -104,7 +105,6 @@ std::string conjunctive_normal_form(std::string format) {
   ASTNode::transformOperations(nnfRoot);
   ASTNode::transformDisjunctionToConjunction(nnfRoot);
 
-
   // also if you want to see
   // nnfRoot->printAST();
 
@@ -146,50 +146,64 @@ bool sat(const std::string &formula) {
   return stack.top();  // The final result of the formula
 }
 
-
-std::vector<std::vector<int> > powerset(const std::vector<int>& set) {
-    if (set.empty()) {
-        // Base case: empty set, return the empty set as the only subset
-        std::vector<std::vector<int> > subsets;
-        subsets.push_back(std::vector<int>());
-        return subsets;
-    }
-
-    int element = set.back();  // Get the last element of the set
-    std::vector<int> setCopy(set.begin(), set.end() - 1);  // Copy the set without the last element
-
-    std::vector<std::vector<int> > subsets = powerset(setCopy);
-
-    // Create new subsets by including the current element
-    std::vector<std::vector<int> > newSubsets;
-    for (std::size_t i = 0; i < subsets.size(); ++i) {
-        std::vector<int> newSubset = subsets[i];
-        newSubset.push_back(element);
-        newSubsets.push_back(newSubset);
-    }
-
-    // Merge the new subsets with the existing subsets
-    for (std::size_t i = 0; i < newSubsets.size(); ++i) {
-        subsets.push_back(newSubsets[i]);
-    }
-
+std::vector<std::vector<int> > powerset(const std::vector<int> &set) {
+  if (set.empty()) {
+    // Base case: empty set, return the empty set as the only subset
+    std::vector<std::vector<int> > subsets;
+    subsets.push_back(std::vector<int>());
     return subsets;
+  }
+
+  int element = set.back();                              // Get the last element of the set
+  std::vector<int> setCopy(set.begin(), set.end() - 1);  // Copy the set without the last element
+
+  std::vector<std::vector<int> > subsets = powerset(setCopy);
+
+  // Create new subsets by including the current element
+  std::vector<std::vector<int> > newSubsets;
+  for (std::size_t i = 0; i < subsets.size(); ++i) {
+    std::vector<int> newSubset = subsets[i];
+    newSubset.push_back(element);
+    newSubsets.push_back(newSubset);
+  }
+
+  // Merge the new subsets with the existing subsets
+  for (std::size_t i = 0; i < newSubsets.size(); ++i) {
+    subsets.push_back(newSubsets[i]);
+  }
+
+  return subsets;
 }
 
-std::vector<std::vector<int> > powerset_iter(const std::vector<int>& set) {
-    std::vector<std::vector<int> > result;
-    int n = set.size();
-    int numSubsets = 1 << n;  // Calculate the total number of subsets (2^n)
+std::vector<std::vector<int> > powerset_iter(const std::vector<int> &set) {
+  std::vector<std::vector<int> > result;
+  int n = set.size();
+  int numSubsets = 1 << n;  // Calculate the total number of subsets (2^n)
 
-    for (int i = 0; i < numSubsets; ++i) {
-        std::vector<int> subset;
-        for (int j = 0; j < n; ++j) {
-            if ((i & (1 << j)) != 0) {
-                subset.push_back(set[j]);
-            }
-        }
-        result.push_back(subset);
+  for (int i = 0; i < numSubsets; ++i) {
+    std::vector<int> subset;
+    for (int j = 0; j < n; ++j) {
+      if ((i & (1 << j)) != 0) {
+        subset.push_back(set[j]);
+      }
     }
+    result.push_back(subset);
+  }
 
-    return result;
+  return result;
+}
+
+VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> > &sets, const std::vector<char> &variables) {
+  VariableAssignmentSet variableMapping;
+  std::cout << sets.size() << variables.size() << std::endl;
+  if (sets.size() != variables.size()) {
+    throw std::runtime_error("Number of sets and number of variables mismatch");
+  }
+  for (std::size_t i = 0; i < variables.size(); ++i) {
+    char variable = variables[i];
+    const std::vector<int> &set = sets[i];
+    variableMapping[variable] = set;
+  }
+
+  return variableMapping;
 }

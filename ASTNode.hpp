@@ -17,17 +17,17 @@ class ASTNode {
   static ASTNode *parseExpression(const std::vector<char> &tokens);
   virtual bool evaluate() = 0;
   virtual bool evaluate(const VariableAssignments &variableAssignments) = 0;
+  virtual std::vector<int> evaluate(const VariableAssignmentSet &variableAssignments) const = 0;
+
   void printAST(const std::string &prefix = "", bool isLeft = false) const;
   // void tokenize(std::string str, std::string symbols);
   static ASTNode *NegNNF(ASTNode *phi);
   static ASTNode *BNF2NNF(ASTNode *formula);
-    static void transformDisjunctionToConjunction(ASTNode* node);
-  static std::vector<ASTNode*> tseitinTransformation(ASTNode* node, int& counter);
-  static void transformOperations(ASTNode* node);
+  static void transformDisjunctionToConjunction(ASTNode *node);
+  static std::vector<ASTNode *> tseitinTransformation(ASTNode *node, int &counter);
+  static void transformOperations(ASTNode *node);
   // New function to get the postfix form as a string
   virtual std::string getPostfix() const = 0;
-
-
 
  private:
   std::vector<char> tokens;
@@ -55,13 +55,17 @@ class OperandNode : public ASTNode {
     int value = variableAssignments.at(variable);
     return static_cast<bool>(value);
   }
+  std::vector<int> evaluate(const VariableAssignmentSet &variableAssignments) const {
+    char variable = getVariable();
+    const std::vector<int> &values = variableAssignments.at(variable);
+    return std::vector<int>(values.begin(), values.end());
+  }
   // Get the operand in postfix form as a string
   std::string getPostfix() const {
     return std::string(1, getVariable());
   }
 
   // Get the inorder postfix form as a string (same as the postfix form)
-
 
  private:
   char variable;
@@ -90,16 +94,42 @@ class UnaryOperationNode : public ASTNode {
       throw std::runtime_error("Invalid unary operator");
     }
   }
+  std::vector<int> evaluate(const VariableAssignmentSet &variableAssignments) const {
+    if (op == '!') {
+      return complement(operand->evaluate(variableAssignments));
+    } else {
+      throw std::runtime_error("Invalid unary operator");
+    }
+  }
+
   // Get the unary operation in postfix form as a string
   std::string getPostfix() const {
     return operand->getPostfix() + getOperator();
   }
 
-    // Get the inorder postfix form as a string
+  // Get the inorder postfix form as a string
 
  private:
   char op;
   ASTNode *operand;
+  std::vector<int> complement(const std::vector<int> &set) const {
+    std::vector<int> result;
+
+    // Handle the case where the input set is empty
+    if (set.empty()) {
+      for (int i = 0; i < set.size(); ++i) {
+        result.push_back(i);
+      }
+    } else {
+      for (int i = 0; i < set.size(); ++i) {
+        if (std::find(set.begin(), set.end(), i) == set.end()) {
+          result.push_back(i);
+        }
+      }
+    }
+
+    return result;
+  }
 };
 
 // AST node for binary operations
@@ -151,8 +181,98 @@ class BinaryOperationNode : public ASTNode {
   std::string getPostfix() const {
     return left->getPostfix() + right->getPostfix() + getOperator();
   }
-  void setLeft(ASTNode* node) { left = node; }
-  void setRight(ASTNode* node) { right = node; }
+  std::vector<int> evaluate(const VariableAssignmentSet &variableAssignments) const {
+    std::vector<int> leftValue = left->evaluate(variableAssignments);
+    std::vector<int> rightValue = right->evaluate(variableAssignments);
+
+    if (op == '&') {
+      return setIntersection(leftValue, rightValue);
+    } else if (op == '|') {
+      return setUnion(leftValue, rightValue);
+    } else if (op == '^') {
+      return setDifference(setUnion(leftValue, rightValue), setIntersection(leftValue, rightValue));
+    } else if (op == '>') {
+      return setDifference(setUnion(rightValue, complement(leftValue)), leftValue);
+    } else if (op == '=') {
+      return setIntersection(setUnion(leftValue, complement(leftValue)), setUnion(rightValue, complement(rightValue)));
+    } else {
+      throw std::runtime_error("Invalid binary operator");
+    }
+  }
+  void setLeft(ASTNode *node) { left = node; }
+  void setRight(ASTNode *node) { right = node; }
+  std::vector<int> setIntersection(const std::vector<int> &set1, const std::vector<int> &set2) const {
+    std::vector<int> result;
+    for (std::size_t i = 0; i < set1.size(); ++i) {
+      int element = set1[i];
+      bool found = false;
+      for (std::size_t j = 0; j < set2.size(); ++j) {
+        if (set2[j] == element) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        result.push_back(element);
+      }
+    }
+    return result;
+  }
+
+  std::vector<int> setUnion(const std::vector<int> &set1, const std::vector<int> &set2) const {
+    std::vector<int> result = set1;
+    for (std::size_t i = 0; i < set2.size(); ++i) {
+      int element = set2[i];
+      bool found = false;
+      for (std::size_t j = 0; j < result.size(); ++j) {
+        if (result[j] == element) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        result.push_back(element);
+      }
+    }
+    return result;
+  }
+
+  std::vector<int> setDifference(const std::vector<int> &set1, const std::vector<int> &set2) const {
+    std::vector<int> result;
+    for (std::size_t i = 0; i < set1.size(); ++i) {
+      int element = set1[i];
+      bool found = false;
+      for (std::size_t j = 0; j < set2.size(); ++j) {
+        if (set2[j] == element) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        result.push_back(element);
+      }
+    }
+    return result;
+  }
+
+  std::vector<int> complement(const std::vector<int> &set) const {
+    std::vector<int> result;
+    for (std::size_t i = 0; i < set.size(); ++i) {
+      int element = set[i];
+      bool found = false;
+      for (std::size_t j = 0; j < set.size(); ++j) {
+        if (set[j] == element) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        result.push_back(element);
+      }
+    }
+    return result;
+  }
+
  private:
   char op;
   ASTNode *left;

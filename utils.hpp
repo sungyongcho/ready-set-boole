@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+// #include "ASTNode.hpp"
 
 std::vector<char> tokenize(std::string str, std::string symbols);
 
@@ -23,4 +24,8 @@ bool sat(const std::string &formula);
 // ex08
 std::vector<std::vector<int> > powerset(const std::vector<int>& set);
 std::vector<std::vector<int> > powerset_iter(const std::vector<int>& set);
+
+// for ex09
+typedef std::unordered_map<char, std::vector<int> > VariableAssignmentSet;
+VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> >& sets, const std::vector<char>& variables);
 #endif  // UTILS_HPP
