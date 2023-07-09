@@ -11,5 +11,4 @@ int main() {
     std::cout << "Mapped value: " << map(5, 3) << std::endl;
     reverse_map(map(5,3));
 
-    return 0;
 }
