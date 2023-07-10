@@ -240,16 +240,10 @@ class BinaryOperationNode : public ASTNode {
         result.push_back(element);
       }
     }
-    // for (int i = 0; i < (int)result.size(); i++)
-    //   std::cout << "*" << result[i] << "*" << std::endl;
     return result;
   }
 
   std::vector<int> setDifference(const std::vector<int> &set1, const std::vector<int> &set2) const {
-    for (int i = 0; i < (int)set1.size(); i++)
-      std::cout << "[" << set1[i] << "]" << std::endl;
-    for (int i = 0; i < (int)set2.size(); i++)
-      std::cout << "*" << set2[i] << "*" << std::endl;
     std::vector<int> result;
     for (std::size_t i = 0; i < set1.size(); ++i) {
       int element = set1[i];

@@ -45,19 +45,19 @@ int main() {
 
   std::vector<int> set2;
   set2.push_back(0);
-  set2.push_back(1);
-  set2.push_back(2);
+  // set2.push_back(1);
+  // set2.push_back(2);
 
-  // std::vector<int> set3;
+  std::vector<int> set3;
   // set3.push_back(3);
-  // set3.push_back(4);
+  set3.push_back(0);
   // set3.push_back(5);
 
   sets.push_back(set1);
   sets.push_back(set2);
-  // sets.push_back(set3);
+  sets.push_back(set3);
 
-  std::vector<int> result = eval_set("AB>", sets);
+  std::vector<int> result = eval_set("ABC^^", sets);
 
   if (result.empty()) {
     std::cout << "Empty set" << std::endl;
