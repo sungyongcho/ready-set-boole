@@ -121,7 +121,7 @@ class UnaryOperationNode : public ASTNode {
         result.push_back(i);
       }
     } else {
-      for (int i = 0; i < set.size(); ++i) {
+      for (int i = 0; i < set.size() + 1; ++i) {
         if (std::find(set.begin(), set.end(), i) == set.end()) {
           result.push_back(i);
         }
@@ -192,9 +192,9 @@ class BinaryOperationNode : public ASTNode {
     } else if (op == '^') {
       return setDifference(setUnion(leftValue, rightValue), setIntersection(leftValue, rightValue));
     } else if (op == '>') {
-      return setDifference(setUnion(rightValue, complement(leftValue)), leftValue);
+      return setUnion(rightValue, complement(leftValue, rightValue));
     } else if (op == '=') {
-      return setIntersection(setUnion(leftValue, complement(leftValue)), setUnion(rightValue, complement(rightValue)));
+      return setIntersection(setUnion(leftValue, complement(leftValue, rightValue)), setUnion(rightValue, complement(rightValue, leftValue)));
     } else {
       throw std::runtime_error("Invalid binary operator");
     }
@@ -220,7 +220,13 @@ class BinaryOperationNode : public ASTNode {
   }
 
   std::vector<int> setUnion(const std::vector<int> &set1, const std::vector<int> &set2) const {
-    std::vector<int> result = set1;
+    std::vector<int> result;
+
+    for (std::size_t i = 0; i < set1.size(); ++i) {
+      result.push_back(set1[i]);
+    }
+
+    // Copy elements from set2 to result if not already present
     for (std::size_t i = 0; i < set2.size(); ++i) {
       int element = set2[i];
       bool found = false;
@@ -234,10 +240,16 @@ class BinaryOperationNode : public ASTNode {
         result.push_back(element);
       }
     }
+    // for (int i = 0; i < (int)result.size(); i++)
+    //   std::cout << "*" << result[i] << "*" << std::endl;
     return result;
   }
 
   std::vector<int> setDifference(const std::vector<int> &set1, const std::vector<int> &set2) const {
+    for (int i = 0; i < (int)set1.size(); i++)
+      std::cout << "[" << set1[i] << "]" << std::endl;
+    for (int i = 0; i < (int)set2.size(); i++)
+      std::cout << "*" << set2[i] << "*" << std::endl;
     std::vector<int> result;
     for (std::size_t i = 0; i < set1.size(); ++i) {
       int element = set1[i];
@@ -252,16 +264,11 @@ class BinaryOperationNode : public ASTNode {
         result.push_back(element);
       }
     }
-    return result;
-  }
-
-  std::vector<int> complement(const std::vector<int> &set) const {
-    std::vector<int> result;
-    for (std::size_t i = 0; i < set.size(); ++i) {
-      int element = set[i];
+    for (std::size_t i = 0; i < set2.size(); ++i) {
+      int element = set2[i];
       bool found = false;
-      for (std::size_t j = 0; j < set.size(); ++j) {
-        if (set[j] == element) {
+      for (std::size_t j = 0; j < set1.size(); ++j) {
+        if (set1[j] == element) {
           found = true;
           break;
         }
@@ -270,6 +277,24 @@ class BinaryOperationNode : public ASTNode {
         result.push_back(element);
       }
     }
+    return result;
+  }
+  std::vector<int> complement(const std::vector<int> &set1, const std::vector<int> &set2) const {
+    std::vector<int> result;
+    for (std::size_t i = 0; i < set2.size(); ++i) {
+      int element = set2[i];
+      bool found = false;
+      for (std::size_t j = 0; j < set1.size(); ++j) {
+        if (set1[j] == element) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        result.push_back(element);
+      }
+    }
+
     return result;
   }
 

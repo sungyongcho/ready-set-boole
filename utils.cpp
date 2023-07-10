@@ -198,7 +198,6 @@ std::vector<std::vector<int> > powerset_iter(const std::vector<int> &set) {
 
 VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> > &sets, const std::vector<char> &variables) {
   VariableAssignmentSet variableMapping;
-  std::cout << sets.size() << variables.size() << std::endl;
   if (sets.size() != variables.size()) {
     throw std::runtime_error("Number of sets and number of variables mismatch");
   }
