@@ -15,6 +15,7 @@ std::vector<std::vector<int> > generateCombinations(const std::vector<char> &var
 VariableAssignments createVariableAssignment(const std::vector<char> &variables, const std::vector<int> &combination);
 void printTableHeader(const std::vector<char> &variables);
 void printTableRow(const std::vector<int> &row);
+void print_truth_table(std::string formula);
 // for ex04
 
 // ex06

@@ -92,6 +92,42 @@ void printTableRow(const std::vector<int> &row) {
   std::cout << std::endl;
 }
 
+void print_truth_table(std::string formula) {
+  std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
+
+  ASTNode *rootNode = nullptr;
+
+  std::vector<char> tokens = tokenize(formula, symbols);
+  std::vector<char> variables = extractVariables(tokens);
+
+  rootNode = ASTNode::parseExpression(tokens);
+  // if you want to print
+  // rootNode->printAST();
+
+  printTableHeader(variables);
+  std::vector<int> combination(variables.size());
+  while (true) {
+    VariableAssignments assignment = createVariableAssignment(variables, combination);
+    bool result = rootNode->evaluate(assignment);
+    std::vector<int> row = combination;
+    row.push_back(result);
+    printTableRow(row);
+
+    // Generate the next combination
+    bool carry = true;
+    for (int i = combination.size() - 1; i >= 0; i--) {
+      if (carry) {
+        combination[i] = (combination[i] + 1) % 2;
+        carry = (combination[i] == 0);
+      }
+    }
+
+    if (carry) {
+      break;  // All combinations generated
+    }
+  }
+}
+
 std::string conjunctive_normal_form(std::string format) {
   std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
 
@@ -107,6 +143,7 @@ std::string conjunctive_normal_form(std::string format) {
   // nnfRoot->printAST();
   ASTNode::transformOperations(nnfRoot);
   ASTNode::transformDisjunctionToConjunction(nnfRoot);
+  ASTNode::transformDisjunctionToConjunctionTwo(nnfRoot);
 
   // also if you want to see
   // nnfRoot->printAST();
@@ -117,36 +154,40 @@ std::string conjunctive_normal_form(std::string format) {
 }
 
 bool sat(const std::string &formula) {
-  std::string cnfTrasnformed = conjunctive_normal_form(formula);
-  std::stack<bool> stack;
+  std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
 
-  for (std::size_t i = 0; i < cnfTrasnformed.size(); ++i) {
-    char token = cnfTrasnformed[i];
-    if (isalpha(token)) {
-      stack.push(true);
-    } else if (token == '!') {
-      // Unary operator (negation)
-      bool operand = stack.top();
-      stack.pop();
-      stack.push(!operand);
-    } else if (token == '&') {
-      // Conjunction (AND)
-      bool operand2 = stack.top();
-      stack.pop();
-      bool operand1 = stack.top();
-      stack.pop();
-      stack.push(operand1 && operand2);
-    } else if (token == '|') {
-      // Disjunction (OR)
-      bool operand2 = stack.top();
-      stack.pop();
-      bool operand1 = stack.top();
-      stack.pop();
-      stack.push(operand1 || operand2);
+  ASTNode *rootNode = nullptr;
+
+  std::vector<char> tokens = tokenize(formula, symbols);
+  std::vector<char> variables = extractVariables(tokens);
+
+  rootNode = ASTNode::parseExpression(tokens);
+  // if you want to print
+  // rootNode->printAST();
+
+  std::vector<int> combination(variables.size());
+  while (true) {
+    VariableAssignments assignment = createVariableAssignment(variables, combination);
+    bool result = rootNode->evaluate(assignment);
+    if (result) {
+      return true;  // The formula is satisfiable
+    }
+
+    // Generate the next combination
+    bool carry = true;
+    for (int i = combination.size() - 1; i >= 0; i--) {
+      if (carry) {
+        combination[i] = (combination[i] + 1) % 2;
+        carry = (combination[i] == 0);
+      }
+    }
+
+    if (carry) {
+      break;  // All combinations generated
     }
   }
 
-  return stack.top();  // The final result of the formula
+  return false;  // The formula is unsatisfiable
 }
 
 std::vector<std::vector<int> > powerset(const std::vector<int> &set) {

@@ -24,6 +24,7 @@ class ASTNode {
   static ASTNode *NegNNF(ASTNode *phi);
   static ASTNode *BNF2NNF(ASTNode *formula);
   static void transformDisjunctionToConjunction(ASTNode *node);
+  static void transformDisjunctionToConjunctionTwo(ASTNode* node);
   static std::vector<ASTNode *> tseitinTransformation(ASTNode *node, int &counter);
   static void transformOperations(ASTNode *node);
   // New function to get the postfix form as a string
@@ -141,6 +142,9 @@ class BinaryOperationNode : public ASTNode {
   char getOperator() const { return op; }
   ASTNode *getLeft() const { return left; }
   ASTNode *getRight() const { return right; }
+  void setOperator(char newOp) {
+    op = newOp;
+  }
 
   bool evaluate() {
     bool leftValue = left->evaluate();

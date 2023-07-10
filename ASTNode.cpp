@@ -202,6 +202,47 @@ void ASTNode::transformDisjunctionToConjunction(ASTNode* node) {
   }
 }
 
+void ASTNode::transformDisjunctionToConjunctionTwo(ASTNode* node) {
+  if (node == nullptr)
+    return;
+
+  if (BinaryOperationNode* binaryNode = dynamic_cast<BinaryOperationNode*>(node)) {
+    transformDisjunctionToConjunction(binaryNode->getLeft());
+    transformDisjunctionToConjunction(binaryNode->getRight());
+
+    if (binaryNode->getOperator() == '|') {
+      ASTNode* leftChild = binaryNode->getLeft();
+      ASTNode* rightChild = binaryNode->getRight();
+
+      if (leftChild != nullptr && rightChild != nullptr &&
+          dynamic_cast<UnaryOperationNode*>(leftChild) != nullptr &&
+          dynamic_cast<UnaryOperationNode*>(rightChild) != nullptr &&
+          dynamic_cast<UnaryOperationNode*>(leftChild)->getOperator() == '!' &&
+          dynamic_cast<UnaryOperationNode*>(rightChild)->getOperator() == '!') {
+
+        ASTNode* negatedLeftChild = dynamic_cast<UnaryOperationNode*>(leftChild)->getOperand();
+        ASTNode* negatedRightChild = dynamic_cast<UnaryOperationNode*>(rightChild)->getOperand();
+
+        // Create a new conjunction node with the negated child nodes
+        ASTNode* conjunctionNode = new BinaryOperationNode('&', negatedLeftChild, negatedRightChild);
+
+        // Replace the root node with the new conjunction node
+        binaryNode->setOperator('&');
+        binaryNode->setLeft(negatedLeftChild);
+        binaryNode->setRight(negatedRightChild);
+        // // Replace the root node with the new conjunction node
+        // *binaryNode = *conjunctionNode;
+
+        // // Clean up the negation nodes
+        // delete conjunctionNode;
+        // delete leftChild;
+        // delete rightChild;
+      }
+    }
+  }
+}
+
+
 void ASTNode::transformOperations(ASTNode* node) {
   if (node == nullptr)
     return;
