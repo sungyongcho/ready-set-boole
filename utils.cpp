@@ -23,7 +23,7 @@ std::vector<char> tokenize(std::string str, std::string symbols) {
   }
   return tokens;
 }
-
+//ex04
 std::vector<char> extractVariables(std::vector<char> tokens) {
   std::vector<char> variables;
   for (std::vector<char>::iterator it = tokens.begin(); it != tokens.end(); it++) {
@@ -32,26 +32,6 @@ std::vector<char> extractVariables(std::vector<char> tokens) {
     }
   }
   return variables;
-}
-
-std::vector<std::vector<int> > generateCombinations(const std::vector<char> &variables) {
-  std::vector<std::vector<int> > combinations;
-  int numVariables = variables.size();
-
-  int numCombinations = 1 << numVariables;  // 2^numVariables
-
-  for (int i = 0; i < numCombinations; i++) {
-    std::vector<int> combination(numVariables);
-
-    // Assign truth values based on binary representation of i
-    for (int j = 0; j < numVariables; j++) {
-      combination[j] = (i >> (numVariables - 1 - j)) & 1;
-    }
-
-    combinations.push_back(combination);
-  }
-
-  return combinations;
 }
 
 VariableAssignments createVariableAssignment(const std::vector<char> &variables, const std::vector<int> &combination) {
@@ -67,6 +47,7 @@ VariableAssignments createVariableAssignment(const std::vector<char> &variables,
   return assignment;
 }
 
+// ex04
 void printTableHeader(const std::vector<char> &variables) {
   std::cout << "| ";
   for (int i = 0; i < (int)variables.size(); i++) {
@@ -81,6 +62,7 @@ void printTableHeader(const std::vector<char> &variables) {
   std::cout << std::endl;
 }
 
+// ex04
 void printTableRow(const std::vector<int> &row) {
   std::cout << "| ";
   for (int i = 0; i < (int)row.size(); i++) {
@@ -92,6 +74,7 @@ void printTableRow(const std::vector<int> &row) {
   std::cout << std::endl;
 }
 
+// ex04
 void print_truth_table(std::string formula) {
   std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
 
@@ -127,6 +110,32 @@ void print_truth_table(std::string formula) {
     }
   }
 }
+
+// ex05
+// ref:
+// https://logic4free.informatik.uni-kiel.de/llocs/Negation_normal_form
+// (this is gold)
+
+std::string negation_normal_form(std::string format) {
+  std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
+
+  ASTNode *rootNode = nullptr;
+
+  std::vector<char> tokens = tokenize(format, symbols);
+
+  rootNode = ASTNode::parseExpression(tokens);
+  // if you want to see
+  // rootNode->printAST();
+
+  ASTNode *nnfRoot = ASTNode::BNF2NNF(rootNode);
+
+  // also if you want to see
+  // nnfRoot->printAST();
+
+  return nnfRoot->getPostfix();
+}
+
+// ex06
 
 std::string conjunctive_normal_form(std::string format) {
   std::string symbols = "ABCDEFGHIJKLMNOPQURSTUVWXYZ!&|^>=";
