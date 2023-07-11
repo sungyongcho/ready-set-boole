@@ -25,19 +25,19 @@ int main() {
   // my own
   std::cout << conjunctive_normal_form("AB^") << std::endl;
   std::cout << conjunctive_normal_form("AB=") << std::endl;
-  std::cout << "======" <<std::endl;
-  std::cout << conjunctive_normal_form("A") << std::endl;
-  std::cout << conjunctive_normal_form("A!") << std::endl;
-  std::cout << conjunctive_normal_form("AB&!") << std::endl;
-  std::cout << conjunctive_normal_form("AB>!") << std::endl;
-  std::cout << conjunctive_normal_form("AB=!") << std::endl;
-  std::cout << "======" <<std::endl;
-  std::cout << conjunctive_normal_form("ABC||") << std::endl;
-  std::cout << conjunctive_normal_form("ABC||!") << std::endl;
-  std::cout << conjunctive_normal_form("ABC|&") << std::endl;
-  std::cout << conjunctive_normal_form("ABC&|") << std::endl;
-  std::cout << conjunctive_normal_form("ABC&|!") << std::endl;
-  std::cout << conjunctive_normal_form("ABC^^") << std::endl;
-  std::cout << conjunctive_normal_form("ABC>>") << std::endl;
+  // std::cout << "======" <<std::endl;
+  // std::cout << conjunctive_normal_form("A") << std::endl;
+  // std::cout << conjunctive_normal_form("A!") << std::endl;
+  // std::cout << conjunctive_normal_form("AB&!") << std::endl;
+  // std::cout << conjunctive_normal_form("AB>!") << std::endl;
+  // std::cout << conjunctive_normal_form("AB=!") << std::endl;
+  // std::cout << "======" <<std::endl;
+  // std::cout << conjunctive_normal_form("ABC||") << std::endl;
+  // std::cout << conjunctive_normal_form("ABC||!") << std::endl;
+  // std::cout << conjunctive_normal_form("ABC|&") << std::endl;
+  // std::cout << conjunctive_normal_form("ABC&|") << std::endl;
+  // std::cout << conjunctive_normal_form("ABC&|!") << std::endl;
+  // std::cout << conjunctive_normal_form("ABC^^") << std::endl;
+  // std::cout << conjunctive_normal_form("ABC>>") << std::endl;
 
 }
