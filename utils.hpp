@@ -31,6 +31,8 @@ std::vector<std::vector<int> > powerset_iter(const std::vector<int>& set);
 // for ex09
 typedef std::unordered_map<char, std::vector<int> > VariableAssignmentSet;
 VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> >& sets, const std::vector<char>& variables);
+void printVariableMapping(VariableAssignmentSet variableMapping);
+std::vector<int> eval_set(std::string formula, std::vector<std::vector<int> > sets);
 // for ex09
 
 // ex10

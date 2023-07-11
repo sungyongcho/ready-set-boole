@@ -3,6 +3,7 @@
 
 #include "utils.hpp"
 
+// not necessary so didn't put in utils
 void showSubsets(const std::vector<std::vector<int> >& subsets) {
   std::cout << "Subsets:\n";
 

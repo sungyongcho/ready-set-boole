@@ -4,38 +4,6 @@
 #include "ASTNode.hpp"
 #include "utils.hpp"
 
-void printVariableMapping(VariableAssignmentSet variableMapping) {
-  std::cout << "Variable Mapping:\n";
-  for (VariableAssignmentSet::const_iterator it = variableMapping.begin(); it != variableMapping.end(); it++) {
-    char variable = it->first;
-    const std::vector<int> &set = it->second;
-
-    std::cout << variable << ": ";
-    for (std::size_t i = 0; i < set.size(); ++i) {
-      std::cout << set[i] << " ";
-    }
-    std::cout << "\n";
-  }
-}
-
-std::vector<int> eval_set(std::string formula, std::vector<std::vector<int> > sets) {
-  ASTNode *rootNode = nullptr;
-  std::vector<char> tokens = tokenize(formula, "ABCDEFGHIJKLMNOPQRSTUVWXYZ!&|^>=");
-  std::vector<char> variables = extractVariables(tokens);
-  VariableAssignmentSet variableMapping = createVariableMapping(sets, variables);
-
-  // if you want to print
-  printVariableMapping(variableMapping);
-
-  rootNode = ASTNode::parseExpression(tokens);
-
-  rootNode->printAST();
-
-  std::vector<int> result = rootNode->evaluate(variableMapping);
-
-  return result;
-}
-
 int main() {
   std::vector<std::vector<int> > sets;
   std::vector<int> set1;

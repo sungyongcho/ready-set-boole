@@ -260,6 +260,39 @@ VariableAssignmentSet createVariableMapping(const std::vector<std::vector<int> >
   return variableMapping;
 }
 
+void printVariableMapping(VariableAssignmentSet variableMapping) {
+  std::cout << "Variable Mapping:\n";
+  for (VariableAssignmentSet::const_iterator it = variableMapping.begin(); it != variableMapping.end(); it++) {
+    char variable = it->first;
+    const std::vector<int> &set = it->second;
+
+    std::cout << variable << ": ";
+    for (std::size_t i = 0; i < set.size(); ++i) {
+      std::cout << set[i] << " ";
+    }
+    std::cout << "\n";
+  }
+}
+
+std::vector<int> eval_set(std::string formula, std::vector<std::vector<int> > sets) {
+  ASTNode *rootNode = nullptr;
+  std::vector<char> tokens = tokenize(formula, "ABCDEFGHIJKLMNOPQRSTUVWXYZ!&|^>=");
+  std::vector<char> variables = extractVariables(tokens);
+  VariableAssignmentSet variableMapping = createVariableMapping(sets, variables);
+
+  // if you want to print
+  printVariableMapping(variableMapping);
+
+  rootNode = ASTNode::parseExpression(tokens);
+
+  // // also if you want to print
+  // rootNode->printAST();
+
+  std::vector<int> result = rootNode->evaluate(variableMapping);
+
+  return result;
+}
+
 double map(uint16_t x, uint16_t y) {
   const uint64_t maxValue = (1ULL << 16) - 1;
   try {
