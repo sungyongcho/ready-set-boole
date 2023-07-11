@@ -31,4 +31,13 @@ int main() {
   std::cout << conjunctive_normal_form("AB&!") << std::endl;
   std::cout << conjunctive_normal_form("AB>!") << std::endl;
   std::cout << conjunctive_normal_form("AB=!") << std::endl;
+  std::cout << "======" <<std::endl;
+  std::cout << conjunctive_normal_form("ABC||") << std::endl;
+  std::cout << conjunctive_normal_form("ABC||!") << std::endl;
+  std::cout << conjunctive_normal_form("ABC|&") << std::endl;
+  std::cout << conjunctive_normal_form("ABC&|") << std::endl;
+  std::cout << conjunctive_normal_form("ABC&|!") << std::endl;
+  std::cout << conjunctive_normal_form("ABC^^") << std::endl;
+  std::cout << conjunctive_normal_form("ABC>>") << std::endl;
+
 }

@@ -242,6 +242,43 @@ void ASTNode::transformDisjunctionToConjunctionTwo(ASTNode* node) {
   }
 }
 
+void ASTNode::transformDisjunctionToConjunctionThree(ASTNode* node) {
+  if (node == nullptr)
+    return;
+
+  if (BinaryOperationNode* binaryNode = dynamic_cast<BinaryOperationNode*>(node)) {
+    transformDisjunctionToConjunctionThree(binaryNode->getLeft());
+    transformDisjunctionToConjunctionThree(binaryNode->getRight());
+
+    if (binaryNode->getOperator() == '|') {
+      ASTNode* leftChild = binaryNode->getLeft();
+      ASTNode* rightChild = binaryNode->getRight();
+
+      if (rightChild != nullptr && dynamic_cast<BinaryOperationNode*>(rightChild) != nullptr &&
+          dynamic_cast<BinaryOperationNode*>(rightChild)->getOperator() == '&') {
+
+        // Apply distribute low rule
+        BinaryOperationNode* rightBinaryNode = dynamic_cast<BinaryOperationNode*>(rightChild);
+
+        ASTNode* leftGrandchild = rightBinaryNode->getLeft();
+        ASTNode* rightGrandchild = rightBinaryNode->getRight();
+
+        // Create new disjunction and conjunction nodes
+        ASTNode* disjunctionNode = new BinaryOperationNode('&', leftChild, leftGrandchild);
+        ASTNode* conjunctionNode = new BinaryOperationNode('&', leftChild, rightGrandchild);
+
+        // Replace the root node with the new disjunction node
+        binaryNode->setOperator('|');
+        binaryNode->setLeft(disjunctionNode);
+        binaryNode->setRight(conjunctionNode);
+
+        // Clean up the original right child node and conjunction node
+        // delete rightChild;
+        // delete conjunctionNode;
+      }
+    }
+  }
+}
 
 void ASTNode::transformOperations(ASTNode* node) {
   if (node == nullptr)

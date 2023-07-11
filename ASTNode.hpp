@@ -26,6 +26,7 @@ class ASTNode {
   static ASTNode *BNF2NNF(ASTNode *formula);
   static void transformDisjunctionToConjunction(ASTNode *node);
   static void transformDisjunctionToConjunctionTwo(ASTNode* node);
+  static void transformDisjunctionToConjunctionThree(ASTNode* node);
   static std::vector<ASTNode *> tseitinTransformation(ASTNode *node, int &counter);
   static void transformOperations(ASTNode *node);
   // New function to get the postfix form as a string

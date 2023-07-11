@@ -153,6 +153,7 @@ std::string conjunctive_normal_form(std::string format) {
   ASTNode::transformOperations(nnfRoot);
   ASTNode::transformDisjunctionToConjunction(nnfRoot);
   ASTNode::transformDisjunctionToConjunctionTwo(nnfRoot);
+  ASTNode::transformDisjunctionToConjunctionThree(nnfRoot);
 
   // also if you want to see
   // nnfRoot->printAST();
