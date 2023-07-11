@@ -224,7 +224,7 @@ void ASTNode::transformDisjunctionToConjunctionTwo(ASTNode* node) {
         ASTNode* negatedRightChild = dynamic_cast<UnaryOperationNode*>(rightChild)->getOperand();
 
         // Create a new conjunction node with the negated child nodes
-        ASTNode* conjunctionNode = new BinaryOperationNode('&', negatedLeftChild, negatedRightChild);
+        // ASTNode* conjunctionNode = new BinaryOperationNode('&', negatedLeftChild, negatedRightChild);
 
         // Replace the root node with the new conjunction node
         binaryNode->setOperator('&');

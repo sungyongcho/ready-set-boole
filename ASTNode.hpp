@@ -6,6 +6,7 @@ class UnaryOperationNode;
 class BinaryOperationNode;
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "utils.hpp"
 
@@ -118,11 +119,11 @@ class UnaryOperationNode : public ASTNode {
 
     // Handle the case where the input set is empty
     if (set.empty()) {
-      for (int i = 0; i < set.size(); ++i) {
+      for (int i = 0; i < (int)set.size(); ++i) {
         result.push_back(i);
       }
     } else {
-      for (int i = 0; i < set.size() + 1; ++i) {
+      for (int i = 0; i < (int) set.size() + 1; ++i) {
         if (std::find(set.begin(), set.end(), i) == set.end()) {
           result.push_back(i);
         }
